@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Striver A2Z DSA Tracker</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f5f8;
+      --surface: #ffffff;
+      --surface-strong: #f0f3f8;
+      --surface-muted: #eef1f8;
+      --text: #111827;
+      --text-muted: #6b7280;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --accent-strong: #1d4ed8;
+      --success: #16a34a;
+      --warning: #f59e0b;
+      --danger: #dc2626;
+      --border: rgba(15, 23, 42, 0.1);
+      --radius: 18px;
+      --shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111827;
+        --surface: #1f2937;
+        --surface-strong: #111827;
+        --surface-muted: #111827;
+        --text: #f8fafc;
+        --text-muted: #9ca3af;
+        --accent-soft: #1e3a8a;
+        --accent: #3b82f6;
+        --accent-strong: #60a5fa;
+        --border: rgba(255, 255, 255, 0.08);
+        --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, rgba(59, 130, 246, 0.12), transparent 24%), var(--bg);
+      color: var(--text);
+    }
+    button, input { font: inherit; }
+    .page-wrapper {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 3rem;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .brand {
+      display: grid;
+      gap: 0.5rem;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 2.2vw, 2.4rem);
+      letter-spacing: -0.03em;
+    }
+    .brand p {
+      margin: 0;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 40rem;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .tab {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 0.8rem 1.3rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+    .tab:hover { transform: translateY(-1px); }
+    .tab.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #ffffff;
+      border-color: transparent;
+      box-shadow: 0 16px 40px rgba(37, 99, 235, 0.18);
+    }
+    .panel {
+      display: none;
+    }
+    .panel.active {
+      display: block;
+    }
+    .hero-card {
+      display: grid;
+      gap: 1.2rem;
+      grid-template-columns: 1.4fr 0.8fr;
+      background: var(--surface);
+      border-radius: calc(var(--radius) * 1.1);
+      border: 1px solid var(--border);
+      padding: 1.6rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
+    }
+    .hero-card h2 {
+      margin: 0;
+      font-size: clamp(1.5rem, 2.5vw, 2.3rem);
+      line-height: 1.05;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .hero-pill {
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      border-radius: 999px;
+      padding: 0.65rem 0.95rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .hero-figure {
+      display: grid;
+      gap: 1rem;
+      align-content: center;
+    }
+    .hero-figure .stat-block {
+      background: rgba(37, 99, 235, 0.08);
+      padding: 1rem;
+      border-radius: 18px;
+      display: grid;
+      gap: 0.25rem;
+      text-align: center;
+    }
+    .hero-figure .stat-block strong {
+      display: block;
+      font-size: 1.45rem;
+      color: var(--accent-strong);
+    }
+    .hero-figure .stat-block span {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    .stats-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-bottom: 1.5rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 1rem;
+      box-shadow: inset 0 0 0 1px transparent;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .stat-card:hover { transform: translateY(-2px); border-color: rgba(37, 99, 235, 0.18); }
+    .stat-card small {
+      display: block;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .stat-card h3 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+    .stat-card .progress {
+      margin-top: 0.9rem;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--surface-muted);
+      overflow: hidden;
+    }
+    .stat-card .progress span {
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent-strong), #7c3aed);
+    }
+    .section-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 1.35rem;
+      margin-bottom: 1.5rem;
+    }
+    .section-card h3 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1.15rem;
+    }
+    .setup-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .search-input {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.95rem 1rem;
+      outline: none;
+      background: var(--surface);
+      color: var(--text);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12); }
+    .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .chip {
+      border: 1px solid var(--border);
+      background: var(--surface-muted);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 0.65rem 0.95rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+    .chip:hover { transform: translateY(-1px); }
+    .chip.active {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: transparent;
+    }
+    .topic-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+    .topic-card {
+      border-radius: 22px;
+      overflow: hidden;
+      border: 1px solid transparent;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+      background: var(--surface);
+    }
+    .topic-card:hover { transform: translateY(-3px); border-color: rgba(37, 99, 235, 0.18); }
+    .topic-top {
+      padding: 1rem 1.2rem;
+      display: grid;
+      gap: 0.65rem;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.14), transparent);
+    }
+    .topic-top h4 {
+      margin: 0;
+      font-size: 1rem;
+    }
+    .topic-top .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .topic-top .meta span {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+    .topic-body {
+      padding: 0.95rem 1.2rem 1.2rem;
+      display: grid;
+      gap: 0.75rem;
+    }
+    .topic-progress {
+      height: 10px;
+      background: var(--surface-muted);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .topic-progress span {
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent-strong), var(--accent));
+    }
+    .accordion {
+      width: 100%;
+      display: grid;
+      gap: 0.9rem;
+    }
+    .panel-item {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .panel-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 1.2rem;
+      cursor: pointer;
+    }
+    .panel-label:hover { background: var(--surface-muted); }
+    .panel-label h4 {
+      font-size: 1rem;
+      margin: 0;
+    }
+    .panel-body {
+      display: none;
+      padding: 0 1.2rem 1rem;
+      gap: 0.75rem;
+      grid-template-columns: 1fr;
+    }
+    .panel-body.open { display: grid; }
+    .problem-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .problem-item:last-child { border-bottom: none; }
+    .problem-checkbox {
+      width: 20px;
+      height: 20px;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      position: relative;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      background: #ffffff;
+    }
+    .problem-checkbox.checked {
+      background: var(--success);
+      border-color: var(--success);
+    }
+    .problem-checkbox.checked::after {
+      content: "";
+      width: 6px;
+      height: 10px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+      display: block;
+    }
+    .problem-title {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      color: var(--text);
+    }
+    .problem-title.done { text-decoration: line-through; color: var(--text-muted); }
+    .difficulty-pill {
+      border-radius: 999px;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .difficulty-pill.easy { background: #d1fae5; color: #166534; }
+    .difficulty-pill.medium { background: #fde68a; color: #92400e; }
+    .difficulty-pill.hard { background: #fecaca; color: #991b1b; }
+    .path-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+    .phase-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease;
+    }
+    .phase-card:hover { transform: translateY(-2px); }
+    .phase-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    .phase-header h4 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+    .phase-header .week-label {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    .phase-items {
+      display: grid;
+      gap: 0.85rem;
+    }
+    .phase-item {
+      display: grid;
+      gap: 0.35rem;
+      padding: 0.85rem 0.95rem;
+      border-radius: 16px;
+      background: var(--surface-muted);
+    }
+    .phase-item strong {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    .phase-item small {
+      color: var(--text-muted);
+      display: block;
+    }
+    .phase-progress {
+      height: 8px;
+      background: rgba(59, 130, 246, 0.16);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .phase-progress span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--accent-strong), #7c3aed);
+    }
+    .empty-state {
+      padding: 1.5rem;
+      text-align: center;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      color: var(--text-muted);
+    }
+    .legend {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+    .badge-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+    .dot-easy { background: #22c55e; }
+    .dot-medium { background: #f59e0b; }
+    .dot-hard { background: #ef4444; }
+    @media (max-width: 840px) {
+      .hero-card { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px) {
+      .topbar { flex-direction: column; }
+      .setup-row { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-wrapper">
+    <div class="topbar">
+      <div class="brand">
+        <h1>Striver A2Z DSA Tracker</h1>
+        <p>Track your progress across 15 core DSA patterns, keep a clean study path, and gain momentum with a polished dashboard.</p>
+      </div>
+      <div class="nav-tabs" role="tablist" aria-label="Tracker tabs">
+        <button class="tab active" type="button" data-target="dashboard">Dashboard</button>
+        <button class="tab" type="button" data-target="patterns">Problems</button>
+        <button class="tab" type="button" data-target="path">Study Path</button>
+      </div>
+    </div>
+
+    <section id="dashboard" class="panel active" role="tabpanel">
+      <div class="hero-card">
+        <div>
+          <h2>Build consistency, not chaos.</h2>
+          <div class="hero-meta">
+            <span class="hero-pill">450+ problems</span>
+            <span class="hero-pill">15 strategy patterns</span>
+            <span class="hero-pill">20-week plan</span>
+          </div>
+          <div class="legend">
+            <div class="legend-item"><span class="badge-dot dot-easy"></span> Easy</div>
+            <div class="legend-item"><span class="badge-dot dot-medium"></span> Medium</div>
+            <div class="legend-item"><span class="badge-dot dot-hard"></span> Hard</div>
+          </div>
+        </div>
+        <div class="hero-figure">
+          <div class="stat-block">
+            <strong id="completionPercent">0%</strong>
+            <span>Overall complete</span>
+          </div>
+          <div class="stat-block">
+            <strong id="completedCount">0</strong>
+            <span>Problems solved</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <article class="stat-card">
+          <small>Total problems</small>
+          <h3 id="totalProblems">0</h3>
+          <div class="progress"><span id="progressTotal"></span></div>
+        </article>
+        <article class="stat-card">
+          <small>Easy solved</small>
+          <h3 id="easyStats">0 / 0</h3>
+          <div class="progress"><span id="progressEasy"></span></div>
+        </article>
+        <article class="stat-card">
+          <small>Medium solved</small>
+          <h3 id="mediumStats">0 / 0</h3>
+          <div class="progress"><span id="progressMedium"></span></div>
+        </article>
+        <article class="stat-card">
+          <small>Hard solved</small>
+          <h3 id="hardStats">0 / 0</h3>
+          <div class="progress"><span id="progressHard"></span></div>
+        </article>
+      </div>
+
+      <div class="section-card">
+        <h3>Progress by pattern</h3>
+        <div id="topicPreview" class="topic-grid"></div>
+      </div>
+    </section>
+
+    <section id="patterns" class="panel" role="tabpanel">
+      <div class="section-card">
+        <div class="setup-row">
+          <input id="searchField" class="search-input" type="search" placeholder="Search problems or patterns..." aria-label="Search problems" />
+          <div class="chip-group" id="filterChips"></div>
+        </div>
+        <div class="accordion" id="patternList"></div>
+      </div>
+    </section>
+
+    <section id="path" class="panel" role="tabpanel">
+      <div class="section-card">
+        <h3>Structured study roadmap</h3>
+        <p>Follow the recommended phase plan and click a card to expand the pattern in the problem list.</p>
+        <div class="path-grid" id="pathGrid"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const DATA = [
+      { id: 1, name: "Basic programming & math", color: "#059669", problems: [
+        { title: "Data types, variables, input/output", level: "easy" },
+        { title: "Pattern printing (stars, numbers)", level: "easy" },
+        { title: "Basic arithmetic operations", level: "easy" },
+        { title: "Check if number is prime", level: "easy" },
+        { title: "Find GCD/LCM of two numbers", level: "easy" },
+        { title: "Check if number is palindrome", level: "easy" },
+        { title: "Count digits in a number", level: "easy" },
+        { title: "Reverse a number", level: "easy" },
+        { title: "Armstrong number check", level: "easy" },
+        { title: "Print all divisors of a number", level: "easy" },
+        { title: "Sieve of Eratosthenes", level: "medium" },
+        { title: "Power calculation (x^n)", level: "medium" },
+        { title: "Square root using binary search", level: "medium" },
+        { title: "Check if number is perfect square", level: "medium" },
+        { title: "Fast exponentiation", level: "hard" },
+        { title: "Modular arithmetic problems", level: "hard" }
+      ] },
+      { id: 2, name: "Sorting algorithms", color: "#1d4ed8", problems: [
+        { title: "Selection sort implementation", level: "easy" },
+        { title: "Bubble sort implementation", level: "easy" },
+        { title: "Insertion sort implementation", level: "easy" },
+        { title: "Merge two sorted arrays", level: "easy" },
+        { title: "Sort array of 0s, 1s, and 2s", level: "easy" },
+        { title: "Merge sort implementation", level: "medium" },
+        { title: "Quick sort implementation", level: "medium" },
+        { title: "Count inversions in array", level: "medium" },
+        { title: "Sort array by frequency", level: "medium" },
+        { title: "External sorting concepts", level: "hard" },
+        { title: "Sorting with custom comparators", level: "hard" }
+      ] },
+      { id: 3, name: "Array manipulation", color: "#d97706", problems: [
+        { title: "Find largest/smallest element", level: "easy" },
+        { title: "Second largest element", level: "easy" },
+        { title: "Check if array is sorted", level: "easy" },
+        { title: "Remove duplicates from sorted array", level: "easy" },
+        { title: "Rotate array by k positions", level: "easy" },
+        { title: "Find missing number in array", level: "easy" },
+        { title: "Move zeros to end", level: "easy" },
+        { title: "Linear search", level: "easy" },
+        { title: "Find union of two sorted arrays", level: "easy" },
+        { title: "Two sum problem", level: "medium" },
+        { title: "Three sum problem", level: "medium" },
+        { title: "Four sum problem", level: "medium" },
+        { title: "Container with most water", level: "medium" },
+        { title: "Sort colors (Dutch National Flag)", level: "medium" },
+        { title: "Remove duplicates from sorted array II", level: "medium" },
+        { title: "Maximum sum subarray of size k", level: "medium" },
+        { title: "Longest subarray with sum k", level: "medium" },
+        { title: "Count subarrays with given sum", level: "medium" },
+        { title: "Subarray sum equals k", level: "medium" },
+        { title: "Maximum subarray sum (Kadane's)", level: "medium" },
+        { title: "Product of array except self", level: "medium" },
+        { title: "Trapping rain water", level: "hard" },
+        { title: "Minimum window substring", level: "hard" },
+        { title: "Sliding window maximum", level: "hard" },
+        { title: "Longest substring without repeating chars", level: "hard" },
+        { title: "Median of two sorted arrays", level: "hard" }
+      ] },
+      { id: 4, name: "Binary search", color: "#4338ca", problems: [
+        { title: "Binary search implementation", level: "easy" },
+        { title: "Search insert position", level: "easy" },
+        { title: "First and last position of element", level: "easy" },
+        { title: "Search in rotated sorted array I", level: "easy" },
+        { title: "Find peak element", level: "easy" },
+        { title: "Find minimum in rotated sorted array", level: "easy" },
+        { title: "Square root using binary search", level: "medium" },
+        { title: "Find nth root of number", level: "medium" },
+        { title: "Koko eating bananas", level: "medium" },
+        { title: "Min days to make m bouquets", level: "medium" },
+        { title: "Smallest divisor given threshold", level: "medium" },
+        { title: "Capacity to ship packages in d days", level: "medium" },
+        { title: "Median of two sorted arrays", level: "hard" },
+        { title: "Kth element of two sorted arrays", level: "hard" },
+        { title: "Aggressive cows problem", level: "hard" },
+        { title: "Book allocation problem", level: "hard" }
+      ] },
+      { id: 5, name: "String manipulation", color: "#9d174d", problems: [
+        { title: "Reverse a string", level: "easy" },
+        { title: "Check if string is palindrome", level: "easy" },
+        { title: "Count vowels and consonants", level: "easy" },
+        { title: "Remove characters from string", level: "easy" },
+        { title: "Check if strings are anagrams", level: "easy" },
+        { title: "Longest common prefix", level: "easy" },
+        { title: "KMP algorithm for pattern matching", level: "medium" },
+        { title: "Rabin-Karp algorithm", level: "medium" },
+        { title: "Z algorithm", level: "medium" },
+        { title: "Minimum window substring", level: "medium" },
+        { title: "Group anagrams", level: "medium" },
+        { title: "Edit distance", level: "hard" },
+        { title: "Distinct subsequences", level: "hard" },
+        { title: "Wildcard pattern matching", level: "hard" }
+      ] },
+      { id: 6, name: "Linked list operations", color: "#047857", problems: [
+        { title: "Insert/Delete at beginning, middle, end", level: "easy" },
+        { title: "Search in linked list", level: "easy" },
+        { title: "Find length of linked list", level: "easy" },
+        { title: "Reverse a linked list", level: "easy" },
+        { title: "Find middle of linked list", level: "easy" },
+        { title: "Detect cycle in linked list", level: "easy" },
+        { title: "Remove nth node from end", level: "medium" },
+        { title: "Intersection of two linked lists", level: "medium" },
+        { title: "Add two numbers as linked lists", level: "medium" },
+        { title: "Merge two sorted linked lists", level: "medium" },
+        { title: "Remove duplicates from sorted linked list", level: "medium" },
+        { title: "Merge k sorted linked lists", level: "hard" },
+        { title: "Reverse nodes in k-group", level: "hard" },
+        { title: "Clone linked list with random pointers", level: "hard" }
+      ] },
+      { id: 7, name: "Recursion & backtracking", color: "#be185d", problems: [
+        { title: "Factorial using recursion", level: "easy" },
+        { title: "Fibonacci using recursion", level: "easy" },
+        { title: "Print numbers 1 to n", level: "easy" },
+        { title: "Sum of first n natural numbers", level: "easy" },
+        { title: "Print all subsequences of string", level: "easy" },
+        { title: "Tower of Hanoi", level: "easy" },
+        { title: "Generate all permutations", level: "medium" },
+        { title: "Generate all combinations", level: "medium" },
+        { title: "Combination sum problems", level: "medium" },
+        { title: "Subset sum problems", level: "medium" },
+        { title: "Word search in grid", level: "medium" },
+        { title: "Generate parentheses", level: "medium" },
+        { title: "N-Queens problem", level: "hard" },
+        { title: "Sudoku solver", level: "hard" },
+        { title: "Word break problem", level: "hard" },
+        { title: "Palindrome partitioning", level: "hard" }
+      ] },
+      { id: 8, name: "Bit manipulation", color: "#0c4a6e", problems: [
+        { title: "Check if number is power of 2", level: "easy" },
+        { title: "Count set bits in number", level: "easy" },
+        { title: "Find the odd occurring element", level: "easy" },
+        { title: "Swap two numbers using XOR", level: "easy" },
+        { title: "Check if ith bit is set", level: "easy" },
+        { title: "Find two odd occurring elements", level: "medium" },
+        { title: "Bit difference between two numbers", level: "medium" },
+        { title: "Maximum XOR of two numbers in array", level: "medium" },
+        { title: "Maximum XOR subarray", level: "hard" },
+        { title: "Minimum XOR of two elements", level: "hard" }
+      ] },
+      { id: 9, name: "Stack & queue", color: "#92400e", problems: [
+        { title: "Implement stack using arrays", level: "easy" },
+        { title: "Implement stack using linked list", level: "easy" },
+        { title: "Valid parentheses", level: "easy" },
+        { title: "Implement queue using stacks", level: "easy" },
+        { title: "Implement stack using queues", level: "easy" },
+        { title: "Next greater element", level: "medium" },
+        { title: "Previous smaller element", level: "medium" },
+        { title: "Largest rectangle in histogram", level: "medium" },
+        { title: "Sliding window maximum", level: "medium" },
+        { title: "LRU cache implementation", level: "medium" },
+        { title: "Maximum rectangle in binary matrix", level: "hard" },
+        { title: "Implement min stack", level: "hard" }
+      ] },
+      { id: 10, name: "Tree algorithms", color: "#166534", problems: [
+        { title: "Inorder traversal", level: "easy" },
+        { title: "Preorder traversal", level: "easy" },
+        { title: "Postorder traversal", level: "easy" },
+        { title: "Level order traversal", level: "easy" },
+        { title: "Height/depth of binary tree", level: "easy" },
+        { title: "Diameter of binary tree", level: "easy" },
+        { title: "Check if tree is balanced", level: "easy" },
+        { title: "Mirror of binary tree", level: "easy" },
+        { title: "Lowest common ancestor", level: "medium" },
+        { title: "Path sum problems", level: "medium" },
+        { title: "Construct tree from traversals", level: "medium" },
+        { title: "Serialize and deserialize binary tree", level: "medium" },
+        { title: "Vertical order traversal", level: "medium" },
+        { title: "Top/bottom view of binary tree", level: "medium" },
+        { title: "Binary tree maximum path sum", level: "hard" },
+        { title: "Recover binary search tree", level: "hard" },
+        { title: "Count complete tree nodes", level: "hard" },
+        { title: "Binary tree cameras", level: "hard" }
+      ] },
+      { id: 11, name: "Graph algorithms", color: "#4338ca", problems: [
+        { title: "BFS implementation", level: "easy" },
+        { title: "DFS implementation", level: "easy" },
+        { title: "Detect cycle in undirected graph", level: "easy" },
+        { title: "Number of connected components", level: "easy" },
+        { title: "Graph representation methods", level: "easy" },
+        { title: "Detect cycle in directed graph", level: "medium" },
+        { title: "Topological sorting", level: "medium" },
+        { title: "Shortest path in unweighted graph", level: "medium" },
+        { title: "Clone graph", level: "medium" },
+        { title: "Course schedule problems", level: "medium" },
+        { title: "Number of islands", level: "medium" },
+        { title: "Dijkstra's shortest path", level: "hard" },
+        { title: "Bellman-Ford algorithm", level: "hard" },
+        { title: "Floyd-Warshall algorithm", level: "hard" },
+        { title: "Minimum spanning tree (Kruskal's, Prim's)", level: "hard" },
+        { title: "Strongly connected components", level: "hard" }
+      ] },
+      { id: 12, name: "Dynamic programming", color: "#be185d", problems: [
+        { title: "Climbing stairs", level: "easy" },
+        { title: "Fibonacci with memoization", level: "easy" },
+        { title: "House robber", level: "easy" },
+        { title: "Maximum sum with no adjacent elements", level: "easy" },
+        { title: "Coin change (count ways)", level: "easy" },
+        { title: "Unique paths in grid", level: "medium" },
+        { title: "Minimum path sum", level: "medium" },
+        { title: "Longest common subsequence", level: "medium" },
+        { title: "Edit distance", level: "medium" },
+        { title: "Knapsack problems", level: "medium" },
+        { title: "Palindromic subsequences", level: "medium" },
+        { title: "Longest increasing subsequence", level: "hard" },
+        { title: "Matrix chain multiplication", level: "hard" },
+        { title: "Egg dropping problem", level: "hard" },
+        { title: "Burst balloons", level: "hard" }
+      ] },
+      { id: 13, name: "Greedy algorithms", color: "#15803d", problems: [
+        { title: "Activity selection problem", level: "easy" },
+        { title: "Fractional knapsack", level: "easy" },
+        { title: "Minimum coins needed", level: "easy" },
+        { title: "Find minimum platforms", level: "easy" },
+        { title: "Job scheduling with deadlines", level: "medium" },
+        { title: "Minimum number of meetings", level: "medium" },
+        { title: "Huffman coding", level: "medium" },
+        { title: "Gas station problem", level: "medium" },
+        { title: "Candy distribution", level: "hard" },
+        { title: "Jump game variations", level: "hard" }
+      ] },
+      { id: 14, name: "Heap / priority queue", color: "#7c2d12", problems: [
+        { title: "Implement min/max heap", level: "easy" },
+        { title: "Kth largest/smallest element", level: "easy" },
+        { title: "Sort array using heap", level: "easy" },
+        { title: "Top K frequent elements", level: "medium" },
+        { title: "Merge K sorted arrays", level: "medium" },
+        { title: "Find median from data stream", level: "medium" },
+        { title: "Sliding window median", level: "hard" },
+        { title: "Employee free time", level: "hard" }
+      ] },
+      { id: 15, name: "Trie (prefix tree)", color: "#0f766e", problems: [
+        { title: "Implement Trie", level: "easy" },
+        { title: "Insert, search, delete in Trie", level: "easy" },
+        { title: "Count words with given prefix", level: "easy" },
+        { title: "Word search II", level: "medium" },
+        { title: "Replace words", level: "medium" },
+        { title: "Maximum XOR problems using Trie", level: "medium" },
+        { title: "Palindrome pairs", level: "hard" },
+        { title: "Stream of characters", level: "hard" }
+      ] }
+    ];
+
+    const PHASES = [
+      { name: "Phase 1 — Foundation", weeks: "Weeks 1–4", color: "#16a34a", patterns: [1, 2, 3] },
+      { name: "Phase 2 — Core data structures", weeks: "Weeks 5–8", color: "#1d4ed8", patterns: [5, 6, 9] },
+      { name: "Phase 3 — Searching & advanced arrays", weeks: "Weeks 9–12", color: "#f59e0b", patterns: [4, 3, 8] },
+      { name: "Phase 4 — Trees & graphs", weeks: "Weeks 13–16", color: "#be185d", patterns: [10, 11, 7] },
+      { name: "Phase 5 — Advanced topics", weeks: "Weeks 17–20", color: "#0f766e", patterns: [12, 13, 14, 15] }
+    ];
+
+    const FILTERS = [
+      { id: 'all', label: 'All' },
+      { id: 'easy', label: 'Easy' },
+      { id: 'medium', label: 'Medium' },
+      { id: 'hard', label: 'Hard' },
+      { id: 'todo', label: 'To do' },
+      { id: 'done', label: 'Done' }
+    ];
+
+    let doneMap = {};
+    let activeFilter = 'all';
+    let searchQuery = '';
+    let openPatternIds = new Set();
+
+    const storageKey = 'dsa_tracker_state_v1';
+    try {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) doneMap = JSON.parse(saved);
+    } catch (error) {
+      console.warn('Unable to read saved progress', error);
+    }
+
+    const saveState = () => {
+      try { localStorage.setItem(storageKey, JSON.stringify(doneMap)); } catch (error) { }
+    };
+
+    const getProblemId = (topicId, problemIndex) => `${topicId}-${problemIndex}`;
+    const isProblemDone = (topicId, problemIndex) => Boolean(doneMap[getProblemId(topicId, problemIndex)]);
+    function toggleProblem(topicId, problemIndex) {
+      const key = getProblemId(topicId, problemIndex);
+      if (doneMap[key]) delete doneMap[key]; else doneMap[key] = true;
+      saveState();
+      renderAll();
+    }
+    function togglePattern(topicId) {
+      if (openPatternIds.has(topicId)) openPatternIds.delete(topicId);
+      else openPatternIds.add(topicId);
+      renderPatterns();
+    }
+
+    const countStats = () => {
+      const stats = { total: 0, completed: 0, easy: 0, medium: 0, hard: 0, easyDone: 0, mediumDone: 0, hardDone: 0 };
+      DATA.forEach(topic => {
+        topic.problems.forEach((problem, index) => {
+          stats.total += 1;
+          const done = isProblemDone(topic.id, index);
+          if (done) stats.completed += 1;
+          if (problem.level === 'easy') { stats.easy += 1; if (done) stats.easyDone += 1; }
+          if (problem.level === 'medium') { stats.medium += 1; if (done) stats.mediumDone += 1; }
+          if (problem.level === 'hard') { stats.hard += 1; if (done) stats.hardDone += 1; }
+        });
+      });
+      return stats;
+    };
+
+    const percent = (value, total) => total ? Math.round(value / total * 100) : 0;
+    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+    const renderDashboard = () => {
+      const stats = countStats();
+      const overall = percent(stats.completed, stats.total);
+      document.getElementById('completionPercent').textContent = `${overall}%`;
+      document.getElementById('completedCount').textContent = stats.completed;
+      document.getElementById('totalProblems').textContent = stats.total;
+      document.getElementById('easyStats').textContent = `${stats.easyDone} / ${stats.easy}`;
+      document.getElementById('mediumStats').textContent = `${stats.mediumDone} / ${stats.medium}`;
+      document.getElementById('hardStats').textContent = `${stats.hardDone} / ${stats.hard}`;
+      document.getElementById('progressTotal').style.width = `${overall}%`;
+      document.getElementById('progressEasy').style.width = `${percent(stats.easyDone, stats.easy)}%`;
+      document.getElementById('progressMedium').style.width = `${percent(stats.mediumDone, stats.medium)}%`;
+      document.getElementById('progressHard').style.width = `${percent(stats.hardDone, stats.hard)}%`;
+
+      const preview = document.getElementById('topicPreview');
+      preview.innerHTML = DATA.slice(0, 8).map(topic => {
+        const completed = topic.problems.filter((problem, index) => isProblemDone(topic.id, index)).length;
+        const total = topic.problems.length;
+        const level = percent(completed, total);
+        const color = topic.color;
+        return `
+          <article class="topic-card" style="border-color: ${color}22;">
+            <div class="topic-top" style="background: linear-gradient(135deg, ${color}22, transparent);">
+              <h4>${topic.name}</h4>
+              <div class="meta"><span>${completed} / ${total}</span><span>${level}%</span></div>
+            </div>
+            <div class="topic-body">
+              <div class="topic-progress"><span style="width: ${level}%"></span></div>
+              <div style="display:grid; gap:0.25rem; color: var(--text-muted); font-size:0.92rem;">${topic.problems.slice(0, 3).map(problem => `<span>${problem.title}</span>`).join('')}</div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    };
+
+    const buildFilters = () => {
+      const wrapper = document.getElementById('filterChips');
+      wrapper.innerHTML = FILTERS.map(filter => `
+        <button type="button" class="chip ${filter.id === activeFilter ? 'active' : ''}" data-filter="${filter.id}">
+          ${filter.label}
+        </button>
+      `).join('');
+      wrapper.querySelectorAll('button').forEach(button => {
+        button.addEventListener('click', () => {
+          activeFilter = button.dataset.filter;
+          buildFilters();
+          renderPatterns();
+        });
+      });
+    };
+
+    const passesFilter = (topic, problem, index) => {
+      if (searchQuery && !problem.title.toLowerCase().includes(searchQuery.toLowerCase()) && !topic.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      if (activeFilter === 'easy' && problem.level !== 'easy') return false;
+      if (activeFilter === 'medium' && problem.level !== 'medium') return false;
+      if (activeFilter === 'hard' && problem.level !== 'hard') return false;
+      if (activeFilter === 'todo' && isProblemDone(topic.id, index)) return false;
+      if (activeFilter === 'done' && !isProblemDone(topic.id, index)) return false;
+      return true;
+    };
+
+    const renderPatterns = () => {
+      const container = document.getElementById('patternList');
+      const filteredTopics = DATA.map(topic => {
+        const filteredProblems = topic.problems.filter((problem, idx) => passesFilter(topic, problem, idx));
+        return { ...topic, filteredProblems };
+      }).filter(topic => topic.filteredProblems.length > 0);
+
+      if (!filteredTopics.length) {
+        container.innerHTML = `<div class="empty-state">No matching problems found. Try a broader filter or clear the search field.</div>`;
+        return;
+      }
+
+      container.innerHTML = filteredTopics.map(topic => {
+        const total = topic.problems.length;
+        const completed = topic.problems.filter((problem, index) => isProblemDone(topic.id, index)).length;
+        const progress = percent(completed, total);
+        const isOpen = openPatternIds.has(topic.id);
+        return `
+          <div class="panel-item" style="border-color: ${topic.color}22;">
+            <button type="button" class="panel-label" onclick="togglePattern(${topic.id})" aria-expanded="${isOpen}">
+              <div>
+                <h4>${topic.name}</h4>
+                <small>${completed} of ${total} solved • ${progress}% complete</small>
+              </div>
+              <span>${isOpen ? '−' : '+'}</span>
+            </button>
+            <div class="panel-body ${isOpen ? 'open' : ''}" id="topic-${topic.id}">
+              ${['easy','medium','hard'].map(level => {
+                const list = topic.filteredProblems.filter(problem => problem.level === level);
+                return list.length ? `
+                  <div>
+                    <strong style="font-size:0.92rem; text-transform: uppercase; letter-spacing:0.08em; color: var(--text-muted);">${level}</strong>
+                    ${list.map(problem => {
+                      const problemIndex = topic.problems.indexOf(problem);
+                      const done = isProblemDone(topic.id, problemIndex);
+                      return `
+                        <div class="problem-item">
+                          <button type="button" class="problem-checkbox ${done ? 'checked' : ''}" onclick="toggleProblem(${topic.id}, ${problemIndex})" aria-pressed="${done}" aria-label="Mark problem as ${done ? 'not done' : 'done'}"></button>
+                          <p class="problem-title ${done ? 'done' : ''}">${problem.title}</p>
+                          <span class="difficulty-pill ${problem.level}">${problem.level}</span>
+                        </div>
+                      `;
+                    }).join('')}
+                  </div>
+                ` : '';
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    };
+
+    const renderPath = () => {
+      const container = document.getElementById('pathGrid');
+      container.innerHTML = PHASES.map(phase => {
+        const rows = phase.patterns.map(patternId => {
+          const topic = DATA.find(item => item.id === patternId);
+          const total = topic.problems.length;
+          const done = topic.problems.filter((problem, idx) => isProblemDone(topic.id, idx)).length;
+          const progress = percent(done, total);
+          return `
+            <div class="phase-item" style="border-left: 4px solid ${phase.color};">
+              <strong>${topic.name}</strong>
+              <small>${done} / ${total} solved</small>
+              <div class="phase-progress"><span style="width: ${progress}%"></span></div>
+            </div>
+          `;
+        }).join('');
+        return `
+          <article class="phase-card">
+            <div class="phase-header">
+              <div>
+                <h4>${phase.name}</h4>
+                <div class="week-label">${phase.weeks}</div>
+              </div>
+              <span style="color: ${phase.color}; font-weight: 700;">${phase.patterns.length} patterns</span>
+            </div>
+            <div class="phase-items">${rows}</div>
+          </article>
+        `;
+      }).join('');
+    };
+
+    const switchTab = (targetId) => {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.toggle('active', tab.dataset.target === targetId));
+      document.querySelectorAll('.panel').forEach(panel => panel.classList.toggle('active', panel.id === targetId));
+      if (targetId === 'dashboard') renderDashboard();
+      if (targetId === 'patterns') renderPatterns();
+      if (targetId === 'path') renderPath();
+    };
+
+    const attachEvents = () => {
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => switchTab(tab.dataset.target));
+      });
+      document.getElementById('searchField').addEventListener('input', (event) => {
+        searchQuery = event.target.value.trim();
+        renderPatterns();
+      });
+    };
+
+    const renderAll = () => {
+      renderDashboard();
+      if (document.getElementById('patterns').classList.contains('active')) renderPatterns();
+      if (document.getElementById('path').classList.contains('active')) renderPath();
+    };
+
+    buildFilters();
+    attachEvents();
+    renderAll();
+  </script>
+</body>
+</html>
