@@ -466,6 +466,28 @@
       border-radius: 999px;
       display: inline-block;
     }
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      align-items: center;
+    }
+    .action-button {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 0.75rem 1.1rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+    .action-button:hover { transform: translateY(-1px); border-color: rgba(37, 99, 235, 0.18); }
+    .action-note {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 0.5rem;
+    }
     .dot-easy { background: #22c55e; }
     .dot-medium { background: #f59e0b; }
     .dot-hard { background: #ef4444; }
@@ -519,6 +541,16 @@
             <span>Problems solved</span>
           </div>
         </div>
+      </div>
+
+      <div class="section-card">
+        <h3>Progress sync</h3>
+        <div class="action-row">
+          <button class="action-button" type="button" onclick="shareProgress()">Copy shareable link</button>
+          <button class="action-button" type="button" onclick="exportProgress()">Export JSON</button>
+          <button class="action-button" type="button" onclick="importProgress()">Import JSON</button>
+        </div>
+        <p class="action-note">Click Copy shareable link, then open that URL on another browser or device to restore your progress automatically.</p>
       </div>
 
       <div class="stats-grid">
@@ -845,6 +877,104 @@
 
     const saveState = () => {
       try { localStorage.setItem(storageKey, JSON.stringify(doneMap)); } catch (error) { }
+    };
+
+    const GLOBAL_PROBLEM_IDS = DATA.flatMap(topic =>
+      topic.problems.map((_, problemIndex) => ({ topicId: topic.id, problemIndex }))
+    );
+
+    const toBase64Url = (value) => btoa(value).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const fromBase64Url = (value) => {
+      const padded = value + '='.repeat((4 - (value.length % 4)) % 4);
+      return atob(padded.replace(/-/g, '+').replace(/_/g, '/'));
+    };
+
+    const encodeProgress = () => {
+      const bits = GLOBAL_PROBLEM_IDS.map(({ topicId, problemIndex }) => isProblemDone(topicId, problemIndex) ? '1' : '0').join('');
+      const bytes = [];
+      for (let i = 0; i < bits.length; i += 8) {
+        bytes.push(parseInt(bits.slice(i, i + 8).padEnd(8, '0'), 2));
+      }
+      return toBase64Url(String.fromCharCode(...bytes));
+    };
+
+    const decodeProgress = (encoded) => {
+      const binary = fromBase64Url(encoded);
+      const state = {};
+      let bitIndex = 0;
+      for (const char of binary) {
+        const value = char.charCodeAt(0);
+        for (let bit = 0; bit < 8 && bitIndex < GLOBAL_PROBLEM_IDS.length; bit += 1, bitIndex += 1) {
+          if (value & (1 << (7 - bit))) {
+            const { topicId, problemIndex } = GLOBAL_PROBLEM_IDS[bitIndex];
+            state[`${topicId}-${problemIndex}`] = true;
+          }
+        }
+      }
+      return state;
+    };
+
+    const getHashState = () => {
+      const hash = window.location.hash.slice(1);
+      const params = new URLSearchParams(hash);
+      return params.get('s');
+    };
+
+    const loadProgressFromHash = () => {
+      const encoded = getHashState();
+      if (!encoded) return;
+      try {
+        doneMap = decodeProgress(encoded);
+        saveState();
+      } catch (error) {
+        console.warn('Unable to decode progress link', error);
+      }
+    };
+
+    const shareProgress = () => {
+      const encoded = encodeProgress();
+      const url = `${window.location.origin}${window.location.pathname}#s=${encoded}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(() => {
+          alert('Shareable progress link copied to clipboard. Open it on another device to restore progress.');
+        }).catch(() => {
+          prompt('Copy this progress link:', url);
+        });
+      } else {
+        prompt('Copy this progress link:', url);
+      }
+      window.history.replaceState(null, '', `#s=${encoded}`);
+    };
+
+    const exportProgress = () => {
+      const data = JSON.stringify(doneMap);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(data).then(() => {
+          alert('Progress data copied to clipboard. Paste it on another browser or device using Import progress.');
+        }).catch(() => {
+          prompt('Copy your progress data from here:', data);
+        });
+      } else {
+        prompt('Copy your progress data from here:', data);
+      }
+    };
+
+    const importProgress = () => {
+      const input = prompt('Paste progress JSON from another browser or device:');
+      if (!input) return;
+      try {
+        const parsed = JSON.parse(input.trim());
+        if (parsed && typeof parsed === 'object') {
+          doneMap = parsed;
+          saveState();
+          renderAll();
+          alert('Progress imported successfully.');
+        } else {
+          throw new Error('Invalid progress format');
+        }
+      } catch (error) {
+        alert('Unable to import progress. Make sure the pasted text is valid progress JSON.');
+      }
     };
 
     const getProblemId = (topicId, problemIndex) => `${topicId}-${problemIndex}`;
